@@ -9,7 +9,7 @@
 using namespace std;
 
 int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minLArDep, double maxLArDep,
-								   const char* dirIn, const char* startFile, const char* dirOut){
+								   const char* dirIn, const char* startFile, const char* dirOut, const char * outPrefix){
 	// load input file
     TFile *input = new TFile(Form("%s/%s", dirIn, startFile),"READ");
     TTree *fTree = (TTree*) input->Get("fTree");
@@ -67,7 +67,7 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
     int i_e = 0;
     for(auto critical_event: eventnumbers){
         i_e++;
-        TFile *out = new TFile(Form("%s/ExportCriticalEvent%d_%d.root", dirOut, i_e, critical_event),
+        TFile *out = new TFile(Form("%s/%s%d_%d.root", dirOut, outPrefix, i_e, critical_event),
 							   "RECREATE");
         TTree* oTree = fTree->CopyTree(Form("eventnumber==%d", critical_event));
         oTree->Write();
@@ -75,21 +75,24 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
     }
     input->Close();
     return eventnumbers.size();
-}//EOF
+}
 
 void extractEventsWtGeCoincidence(const char * dirIn="/home/data/muons-25-july-2020/PostProc/",
                                   const char * filePrefix="SlicedDetections",
 								  double minGeDep=1839, double maxGeDep=2239, double minLArDep=0, double maxLArDep=20000,
-								  const char * dirOut="data/"){
+								  const char * dirOut="data/", const char * outPrefix = "ExportCriticalEvent"){
     void *dirp = gSystem->OpenDirectory(dirIn);
     const char *direntry;
     int k_critical_events = 0;
     while((direntry = (char*) gSystem->GetDirEntry(dirp))){
         TString fileName = direntry;
         if(!isRootFile(fileName, filePrefix))    continue;
-        k_critical_events += processSingleFileGeCoincidence(minGeDep, maxGeDep, minLArDep, maxLArDep, dirIn, direntry, dirOut);
+        k_critical_events += processSingleFileGeCoincidence(minGeDep, maxGeDep, minLArDep, maxLArDep,
+															dirIn, direntry, dirOut, outPrefix);
     }
     // printout result
     cout << "\n[Result] Critical Events: " << k_critical_events << endl;
+    // merging files into a single one
+    mergeTreeFiles(dirOut, outPrefix, "fTree", true);
     gSystem->FreeDirectory(dirp);
 }
