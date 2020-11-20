@@ -9,6 +9,7 @@
 using namespace std;
 
 int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minLArDep, double maxLArDep,
+								   int minGeMultiplicity, int maxGeMultiplicity,
 								   const char* dirIn, const char* startFile, const char* dirOut, const char * outPrefix){
 	// load input file
     TFile *input = new TFile(Form("%s/%s", dirIn, startFile),"READ");
@@ -20,16 +21,18 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
 	double energydeposition = 0;
     int pedetected = 0;
     int eventnumber = 0;
-    int storedeventnumber = -1;
+	int detectornumber = 0;
+	int storedeventnumber = -1;
     double totalNPE = 0;
     double totalArgonEnergy = 0;
     double totalGeEnergy = 0;
+    set<int> hitGeDetectors;
     string *material = NULL;
 	// connect branches
     fTree->SetBranchAddress("energydeposition", &energydeposition);
-    fTree->SetBranchAddress("pedetected", &pedetected);
     fTree->SetBranchAddress("eventnumber", &eventnumber);
-    fTree->SetBranchAddress("material", &material);
+	fTree->SetBranchAddress("material", &material);
+	fTree->SetBranchAddress("detectornumber", &detectornumber);
 	// load first entry to store first event number
     fTree->GetEntry(0);
     storedeventnumber = eventnumber;
@@ -39,7 +42,9 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
         fTree->GetEntry(i);
         if(eventnumber!=storedeventnumber){
         	//Event is complete, begin energy summing of another event
-            if(totalGeEnergy>=minGeDep & totalGeEnergy<=maxGeDep & totalArgonEnergy<=maxLArDep){
+            if(totalGeEnergy>=minGeDep & totalGeEnergy<=maxGeDep &
+               hitGeDetectors.size() >= minGeMultiplicity & hitGeDetectors.size() <= maxGeMultiplicity &
+               totalArgonEnergy>=minLArDep & totalArgonEnergy<=maxLArDep){
                 cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV, NPE: " << totalNPE << endl;
                 eventnumbers.insert(storedeventnumber);
             }
@@ -55,6 +60,7 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
         }
         if(strstr(material->c_str(),"GermaniumEnriched")) {
 	        totalGeEnergy += energydeposition;
+	        hitGeDetectors.insert(detectornumber)
         }
         totalNPE+=pedetected;       // Ge entries have 0 PE detected
     }
@@ -80,7 +86,8 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
 void extractEventsWtGeCoincidence(const char * dirIn="/home/data/muons-25-july-2020/PostProc/",
                                   const char * filePrefix="SlicedDetections",
 								  double minGeDep=1839, double maxGeDep=2239, double minLArDep=0, double maxLArDep=20000,
-								  const char * dirOut="data/", const char * outPrefix = "ExportCriticalEvent"){
+								  int minGeMultiplicity=1, int maxGeMultiplicity=1,
+                                  const char * dirOut="data/", const char * outPrefix = "ExportCriticalEvent"){
     void *dirp = gSystem->OpenDirectory(dirIn);
     const char *direntry;
     int k_critical_events = 0;
@@ -88,7 +95,8 @@ void extractEventsWtGeCoincidence(const char * dirIn="/home/data/muons-25-july-2
         TString fileName = direntry;
         if(!isRootFile(fileName, filePrefix))    continue;
         k_critical_events += processSingleFileGeCoincidence(minGeDep, maxGeDep, minLArDep, maxLArDep,
-															dirIn, direntry, dirOut, outPrefix);
+                                                            minGeMultiplicity, maxGeMultiplicity,
+                                                            dirIn, direntry, dirOut, outPrefix);
     }
     // printout result
     cout << "\n[Result] Critical Events: " << k_critical_events << endl;
