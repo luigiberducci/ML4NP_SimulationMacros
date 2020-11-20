@@ -102,7 +102,7 @@ void write_header(ofstream& outCSV, Double_t DeltaT, Int_t filePartID, Int_t nIn
 	// Write CSV header: number of Dt, Dt in ns, resulting time T
 	outCSV << "# File Part: " << filePartID << "\n";
 	outCSV << "# T: " << DeltaT << "\n";
-	outCSV << "# Each event is a row. Before each row, the id of original events are reported.";
+	outCSV << "# Each event is a row. Before each row, the id of original events are reported.\n";
 	outCSV << "# Row Format: ID, Edep, NPE, InnerSlice0, ..., InnerSlice(N-1), OuterSlice0, ..., OuterSlice(N-1)\n";
 	outCSV << "#\n# Columns:\n";
 	outCSV << "eventnumber,energydeposition,pedetected,";
@@ -163,7 +163,7 @@ void produceTimeDataset(const char * dirIn, const char * dirOut, TString prefixI
 		TString filePath = Form("%s/%s", fullDirIn, entry);
 		TString fileName = entry;
 		if(!isRootFile(fileName, prefixIn))   continue;
-		cout << "\t" << filePath << endl;	// Debug
+		cout << "\t[Debug] File: " << filePath << endl;	// Debug
 		// Open file, get tree and number of sipm
 		TFile *f = TFile::Open(filePath);
 		TTree *fTree = (TTree*) f->Get("fTree");
@@ -177,13 +177,13 @@ void produceTimeDataset(const char * dirIn, const char * dirOut, TString prefixI
 			nInnerSlices = NInnerSlicesParam->GetVal();
 			nOuterSlices = NOuterSlicesParam->GetVal();
 		}
-		cout << "[Debug] Loaded Tree: nentries " << fTree->GetEntries() << endl;
+		cout << "\t[Debug] Loaded Tree: nentries " << fTree->GetEntries() << endl;
 
 		// Compute time of first deposit in lar, and random offset for event-shifting
 		map<Int_t, Double_t> mapEventToFirstTime = getFirstDetectionInLArPerEvents(fTree);
-		cout << "[Debug] Computed T0 for nevents " << mapEventToFirstTime.size() << endl;
+		cout << "\t[Debug] Computed T0 for nevents " << mapEventToFirstTime.size() << endl;
 		map<Int_t, Double_t> mapEventOffset = getRndOffsetPerEvents(mapEventToFirstTime, min_shifting, max_shifting);
-		cout << "[Debug] Computed Rnd Offsets for nevents " << mapEventOffset.size() << endl;
+		cout << "\t[Debug] Computed Rnd Offsets for nevents " << mapEventOffset.size() << endl;
 
 		// Connect branches
 		Int_t eventnumber;
@@ -230,7 +230,7 @@ void produceTimeDataset(const char * dirIn, const char * dirOut, TString prefixI
 							TString outFile(createDatasetFilename(dirOut, prefixOut, deltaT, group_events, file_part_id));
 							outCSV.open(outFile);
 							write_header(outCSV, deltaT, file_part_id, nInnerSlices, nOuterSlices);
-							cout << "[Info] Event " << producedEventCounter << " - Writing in " << outFile << "...\n";
+							cout << "\t[Debug] Start writing in " << outFile << "\n";
 						}
 
 						// Check filter on Tot NPE
@@ -253,8 +253,8 @@ void produceTimeDataset(const char * dirIn, const char * dirOut, TString prefixI
 				TSiPMEvent_offsets.push_back(mapEventOffset[eventnumber]);
 			}
 			// Debug
-			if(i % 10000 == 0)
-				cout << "\rentry: " << i << "/" << nEntries << std::flush;
+			if(i % (nEntries/10) == 0)
+				cout << "\r\tentry: " << i << "/" << nEntries << std::flush;
 			Double_t shiftedTime = time - mapEventToFirstTime[eventnumber] + mapEventOffset[eventnumber];
 			if(shiftedTime < 0 || shiftedTime > deltaT){
 				// if shifted time overflow <0, or if shifted time>deltaT
@@ -276,6 +276,7 @@ void produceTimeDataset(const char * dirIn, const char * dirOut, TString prefixI
 		fTree->Delete();
 		f->Close();
 		f->Delete();
+		cout << endl;
 		cout << "[Info] Produced snapshots: " << writtenEventsCounter << ", ";
 		cout << "skipped entries for time: " << skipped_entries << "\n";
 	}
@@ -290,7 +291,7 @@ void printOutInfos(const char * dirIn, const char * dirOut,
 	cout << "[Info] Input files: " << Form("%s/%s*root", dirIn, inputPrefix) << "\n";
 	cout << "[Info] Output files: " << Form("%s/%s*csv", dirOut, outputPrefix) << "\n";
 	cout << "[Info] Snapshot Config:\n";
-	cout << "\t\tNr Shroud Slices: ";
+	cout << "\tNr Shroud Slices: ";
 	if(nInnerSlices<0 || nOuterSlices<0){
 		cout << "inferred by input files";
 	} else {
@@ -298,8 +299,8 @@ void printOutInfos(const char * dirIn, const char * dirOut,
 		cout << nOuterSlices << " Outer Slices, ";
 	}
 	cout << "\n";
-	cout << "\t\tNr Event per Snapshot: " << groupEvents << "\n";
-	cout << "\t\tProduced events: min NPE: " << minNPE << ", max NPE: " << maxNPE << "\n";
+	cout << "\tNr Event per Snapshot: " << groupEvents << "\n";
+	cout << "\tProduced events: min NPE: " << minNPE << ", max NPE: " << maxNPE << "\n";
 	cout << "\n";
 }
 
@@ -308,8 +309,6 @@ void SnapshotCreator(const char * dirIn, const char * dirOut,
 		            int groupEvents=1, int minNPE=1, int maxNPE=INF, double deltaT=10000,
 		            int nInnerSlices=-1, int nOuterSlices=-1){
 	printOutInfos(dirIn, dirOut, inputPrefix, outputPrefix, groupEvents, minNPE, maxNPE, nInnerSlices, nOuterSlices);
-	system("pause");
-
 	try {
 		produceTimeDataset(dirIn, dirOut, inputPrefix, outputPrefix, groupEvents, minNPE, maxNPE, deltaT, nInnerSlices, nOuterSlices);
 		cout << "[Info] End.\n";
