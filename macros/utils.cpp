@@ -11,7 +11,7 @@ bool isRootFile(TString fileName, TString prefix){
 void mergeTreeFiles(const char * dirIn, const char * filePrefix, const char * treeName="fTree", bool print=true){
 	// open directory
 	if (print) {
-		std::cout << "[Info] Input Directory: " << dirIn << ", ";
+		std::cout << "[Info] Input Directory: " << dirIn << "\n";
 		std::cout << "[Info] Merging files with prefix: " << filePrefix << std::endl;
 	}
 	void *dirPointer = gSystem->OpenDirectory(dirIn);

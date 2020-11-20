@@ -57,6 +57,7 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
             totalGeEnergy = 0;
             totalNPE = 0;
             totalArgonEnergy = 0;
+	        hitGeDetectors.clear();
             storedeventnumber = eventnumber;
         }
 
