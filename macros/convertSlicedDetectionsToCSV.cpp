@@ -74,7 +74,7 @@ void produceSingleExport(TString inFilepath, int nInnerSlices, int nOuterSlices,
 			cout << i << "/" << fTree->GetEntries() << endl;
 		if(!writeOnlyNZeroDep || energydeposition>0){
 			out << eventnumber << "," << PID << "," << time << "," << x << "," << y << "," << z << "," << r << ",";
-			out << *material << "," << setprecision(15) << energydeposition << "," << "," << pedetected << ",";
+			out << *material << "," << setprecision(15) << energydeposition << "," << pedetected << ",";
 			out << detectionefficiency << "," << quantumefficiency << ",";
 			for(int j=0; j<nInnerSlices; j++)
 				out << innerSlices[j] <<  ",";
@@ -85,8 +85,8 @@ void produceSingleExport(TString inFilepath, int nInnerSlices, int nOuterSlices,
 	}
 }
 
-void SlicedDetections_to_csv(const char * dirIn="./", const char * prefixIn="SlicedDetections",
-							 int nInnerSlices=-1, int nOuterSlices=-1, bool writeOnlyNZeroDep=true){
+void convertSlicedDetectionsToCSV(const char * dirIn="./", const char * prefixIn="SlicedDetections",
+								  int nInnerSlices=-1, int nOuterSlices=-1, bool writeOnlyNZeroDep=true){
 	// Loop files in input directory
 	char* fullDirIn = gSystem->ExpandPathName(dirIn);
 	void* dirp = gSystem->OpenDirectory(fullDirIn);
