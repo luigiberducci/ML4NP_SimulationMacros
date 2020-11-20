@@ -8,6 +8,11 @@
 
 using namespace std;
 
+template<typename Number>
+bool checkIfInRange(Number value, Number min, Number max){
+	return value>=min & value<=max;
+}
+
 int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minLArDep, double maxLArDep,
 								   int minGeMultiplicity, int maxGeMultiplicity,
 								   const char* dirIn, const char* startFile, const char* dirOut, const char * outPrefix){
@@ -42,9 +47,9 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
         fTree->GetEntry(i);
         if(eventnumber!=storedeventnumber){
         	//Event is complete, begin energy summing of another event
-            if(totalGeEnergy>=minGeDep & totalGeEnergy<=maxGeDep &
-               hitGeDetectors.size() >= minGeMultiplicity & hitGeDetectors.size() <= maxGeMultiplicity &
-               totalArgonEnergy>=minLArDep & totalArgonEnergy<=maxLArDep){
+            if(checkIfInRange(totalGeEnergy, minGeDep, maxGeDep) &
+               checkIfInRange((int)hitGeDetectors.size(), minGeMultiplicity, maxGeMultiplicity) &
+		       checkIfInRange(totalArgonEnergy, minLArDep, minLArDep)){
                 cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV, NPE: " << totalNPE << endl;
                 eventnumbers.insert(storedeventnumber);
             }
@@ -60,7 +65,7 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
         }
         if(strstr(material->c_str(),"GermaniumEnriched")) {
 	        totalGeEnergy += energydeposition;
-	        hitGeDetectors.insert(detectornumber)
+	        hitGeDetectors.insert(detectornumber);
         }
         totalNPE+=pedetected;       // Ge entries have 0 PE detected
     }
