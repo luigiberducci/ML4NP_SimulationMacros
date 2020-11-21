@@ -17,12 +17,12 @@ bool checkIfInRange(Number value, Number min, Number max){
 
 int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minLArDep, double maxLArDep,
 								   int minGeMultiplicity, int maxGeMultiplicity,
-								   const char* dirIn, const char* startFile, const char* dirOut, const char * outPrefix){
+								   const char* dirIn, const char* startFile, const char* dirOut, const char * outPrefix, int kIterativeCalls=0){
 	// load input file
     TFile *input = new TFile(Form("%s/%s", dirIn, startFile),"READ");
     TTree *fTree = (TTree*) input->Get("fTree");
     int entries = fTree->GetEntries();
-	cout << "File: " << startFile << "\n";
+	cout << kIterativeCalls << " - File: " << startFile << "\n";
 	cout << "\tEntries: " << entries << "\n";
 	// initialize branch variables
 	double energydeposition = 0;
@@ -99,13 +99,14 @@ void extractEventsWtGeCoincidence(const char * dirIn="/home/data/muons-25-july-2
                                   const char * dirOut="data/", const char * outPrefix = "ExportCriticalEvent"){
     void *dirp = gSystem->OpenDirectory(dirIn);
     const char *direntry;
-    int k_critical_events = 0;
+    int k_critical_events = 0, i = 0;
     while((direntry = (char*) gSystem->GetDirEntry(dirp))){
         TString fileName = direntry;
         if(!isRootFile(fileName, filePrefix))    continue;
+        i++;
         k_critical_events += processSingleFileGeCoincidence(minGeDep, maxGeDep, minLArDep, maxLArDep,
                                                             minGeMultiplicity, maxGeMultiplicity,
-                                                            dirIn, direntry, dirOut, outPrefix);
+                                                            dirIn, direntry, dirOut, outPrefix, i);
 
     }
     // printout result
