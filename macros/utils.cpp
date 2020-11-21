@@ -1,5 +1,7 @@
 #include <TChain.h>
 
+using namespace std;
+
 bool isRootFile(TString fileName, TString prefix){
 	// Consider files `prefixXXXXXX.root`
 	TString begin = fileName(0, prefix.Length());
@@ -11,8 +13,8 @@ bool isRootFile(TString fileName, TString prefix){
 void mergeTreeFiles(const char * dirIn, const char * filePrefix, const char * treeName="fTree", bool print=true){
 	// open directory
 	if (print) {
-		std::cout << "[Info] Input Directory: " << dirIn << "\n";
-		std::cout << "[Info] Merging files with prefix: " << filePrefix << std::endl;
+		cout << "[Info] Input Directory: " << dirIn << "\n";
+		cout << "[Info] Merging files with prefix: " << filePrefix << "*root" << endl;
 	}
 	void *dirPointer = gSystem->OpenDirectory(dirIn);
 	const char *dirEntry;
@@ -26,12 +28,16 @@ void mergeTreeFiles(const char * dirIn, const char * filePrefix, const char * tr
 		k_files++;
 	}
 	// merging trees
-	const char *outFile = Form("%s/%s_MERGED.root", dirIn, filePrefix);
-	ch.Merge(outFile);
-	gSystem->FreeDirectory(dirPointer);
-	// print out result
-	if (print) {
-		std::cout << "[Result] Merged Files: " << k_files << ", Output file: " << outFile << std::endl;
-		std::cout << "[Result] Done." << std::endl;
+	if(ch.GetNtrees()>0) {
+		const char *outFile = Form("%s/%s_MERGED.root", dirIn, filePrefix);
+		ch.Merge(outFile);
+		// print out result
+		if (print) {
+			cout << "[Result] Merged Files: " << k_files << ", Output file: " << outFile << endl;
+			cout << "[Result] Done." << endl;
+		}
+	}else{
+		assert(k_files==0);
 	}
+	gSystem->FreeDirectory(dirPointer);
 }
