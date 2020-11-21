@@ -10,6 +10,8 @@ using namespace std;
 
 template<typename Number>
 bool checkIfInRange(Number value, Number min, Number max){
+	if (min<0 & max<0)
+		return true;
 	return value>=min & value<=max;
 }
 
@@ -28,7 +30,6 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
     int eventnumber = 0;
 	int detectornumber = 0;
 	int storedeventnumber = -1;
-    double totalNPE = 0;
     double totalArgonEnergy = 0;
     double totalGeEnergy = 0;
     set<int> hitGeDetectors;
@@ -37,7 +38,9 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
     fTree->SetBranchAddress("energydeposition", &energydeposition);
     fTree->SetBranchAddress("eventnumber", &eventnumber);
 	fTree->SetBranchAddress("material", &material);
-	fTree->SetBranchAddress("detectornumber", &detectornumber);
+	if(minGeMultiplicity>=0 & maxGeMultiplicity>=0) {
+		fTree->SetBranchAddress("detectornumber", &detectornumber);
+	}
 	// load first entry to store first event number
     fTree->GetEntry(0);
     storedeventnumber = eventnumber;
@@ -49,13 +52,14 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
         	//Event is complete, begin energy summing of another event
             if(checkIfInRange(totalGeEnergy, minGeDep, maxGeDep) &
                checkIfInRange((int)hitGeDetectors.size(), minGeMultiplicity, maxGeMultiplicity) &
-		       checkIfInRange(totalArgonEnergy, minLArDep, minLArDep)){
-                cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV, NPE: " << totalNPE << endl;
+		       checkIfInRange(totalArgonEnergy, minLArDep, maxLArDep)){
+	            cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV ";
+	            cout << "(mult=" << hitGeDetectors.size() << "),";
+	            cout << "ArgonEnergy: " << totalArgonEnergy << " KeV\n";
                 eventnumbers.insert(storedeventnumber);
             }
 			// Reset energies counter
             totalGeEnergy = 0;
-            totalNPE = 0;
             totalArgonEnergy = 0;
 	        hitGeDetectors.clear();
             storedeventnumber = eventnumber;
@@ -68,11 +72,10 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
 	        totalGeEnergy += energydeposition;
 	        hitGeDetectors.insert(detectornumber);
         }
-        totalNPE+=pedetected;       // Ge entries have 0 PE detected
     }
     // check last event
     if(totalGeEnergy>=minGeDep & totalGeEnergy<=maxGeDep & totalArgonEnergy<=maxLArDep){
-        cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV, NPE: " << totalNPE << endl;
+        cout << "\tEvent: " << storedeventnumber << ": GeEnergy: " << totalGeEnergy << " KeV" << endl;
         eventnumbers.insert(storedeventnumber);
     }
     // export critical events to separate output files
@@ -103,6 +106,7 @@ void extractEventsWtGeCoincidence(const char * dirIn="/home/data/muons-25-july-2
         k_critical_events += processSingleFileGeCoincidence(minGeDep, maxGeDep, minLArDep, maxLArDep,
                                                             minGeMultiplicity, maxGeMultiplicity,
                                                             dirIn, direntry, dirOut, outPrefix);
+
     }
     // printout result
     cout << "\n[Result] Critical Events: " << k_critical_events << endl;
