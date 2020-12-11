@@ -2,9 +2,9 @@
 In this repo, we collect the code used for simulation and post-processing of simulated data.
 
 It is composed by the following tools:
-- Detection Slicer: given a G4 simulation file (flat format), it simulates the detections using the Optical and Spatial Maps (link).
-- Snapshot Creator: given a simulation with the DetectionSlicer, it export a `csv` file of aggregated acquisition over a given time window.
-- Macros: these are various root macros used for analysis or processing simulation files.
+- **Detection Slicer**: given a G4 simulation file (flat format), it simulates the detections using the Optical and Spatial Maps (link).
+- **Snapshot Creator**: given a simulation with the DetectionSlicer, it export a `csv` file of aggregated acquisition over a given time window.
+- **Macros**: these are various root macros used for analysis or processing simulation files.
 
 ## Detection Slicer
 
