@@ -92,11 +92,11 @@ int processSingleFileGeCoincidence(double minGeDep, double maxGeDep, double minL
     return eventnumbers.size();
 }
 
-void extractEventsWtGeCoincidence(const char * dirIn="data/",
+void extractEventsWtGeCoincidence(const char * dirIn="input/",
                                   const char * filePrefix="output",
                                   double minGeDep=1839, double maxGeDep=2239, double minLArDep=0, double maxLArDep=20000,
                                   int minGeMultiplicity=1, int maxGeMultiplicity=1,
-                                  const char * dirOut="output_data/", const char * outPrefix = "ExportCriticalEvent"){
+                                  const char * dirOut="output/", const char * outPrefix = "ExportCriticalEvent"){
     void *dirp = gSystem->OpenDirectory(dirIn);
     const char *direntry;
     int k_critical_events = 0, i = 0;

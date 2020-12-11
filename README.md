@@ -91,7 +91,7 @@ root [1]
 root [2] double minGeDep = 15;              // minimum 15 KeV in Ge
 root [3] double maxGeDep = 1000000000;      // arbitrary high value
 root [4]
-root [5] extractEventsWtGeCoincidence("data/", "output", minGeDep, maxGeDep)
+root [5] extractEventsWtGeCoincidence("input/", "output", minGeDep, maxGeDep)
 ```
 **Note:** since we don't want any upperbound on the Germanium detections, we use an arbitrary high-value (e.g., 1000000000).
 
@@ -106,7 +106,7 @@ root [3] double maxGeDep = 1000000000;      // arbitrary high value
 root [4] double minLArDep = 0;              // no lowerbound on LAr acquisitions (take also zero detections)
 root [5] double maxLArDep = 10000;          // maximum 10 MeV in LAr
 root [6]
-root [7] extractEventsWtGeCoincidence("data/", "output", minGeDep, maxGeDep, minLArDep, maxLArDep)
+root [7] extractEventsWtGeCoincidence("input/", "output", minGeDep, maxGeDep, minLArDep, maxLArDep)
 ```
 
 Finally, if you want to have only events with all the Germanium deposition in maximum 3 detectors (i.e., crystals), then you can run the following commands:
@@ -121,5 +121,5 @@ root [4] double maxLArDep = 10000;          // maximum 10 MeV in LAr
 root [5] int minGeMult = 1;                 // at least 1 Ge crystal
 root [6] int maxGeMult = 3;                 // maximum 3 Ge crystals
 root [7]
-root [8] extractEventsWtGeCoincidence("data/", "output", minGeDep, maxGeDep, minLArDep, maxLArDep, minGeMult, maxGeMult)
+root [8] extractEventsWtGeCoincidence("input/", "output", minGeDep, maxGeDep, minLArDep, maxLArDep, minGeMult, maxGeMult)
 ```
