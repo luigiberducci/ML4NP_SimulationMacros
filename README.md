@@ -10,11 +10,10 @@ It is composed by the following tools:
 
 ## Snapshot Creator
 
-## Main Macros
-### Extraction Muon events in coincidence with Germanium
+## Extraction Muon events in coincidence with Germanium
 One of the analysis performed consists of considering the performance of the trained model considering the coincidence with Germanium.
 
-#### How to run
+### How to run
 To perform the selection in coincidence with Germanium depositions, you have to use the macro `extractEventsWtGeCoincidence.cpp`.
 
 This macro scans a bunch of simulation files (*G4 file in flat format*):
@@ -26,7 +25,7 @@ In particular, the macro will process each event individually, writing 1 file fo
 This macro has been created to process a small amount of events (i.e., 36 in our study) and then is so disk-consuming.
 The macro can be improved by writing directly in a single output file (*TODO*).
 
-##### Default configuration
+#### Default configuration
 From the current directory, run the following command:
 
 ```
@@ -41,7 +40,7 @@ or directly:
 $>root macros/extractEventsWtGeCoincidence.cpp
 ```
 
-##### IO Management 
+#### IO Management 
 The input-output can be managed with the following parameters:
 |        Parameter          | Description |
 | ------------------------- | ----------- |
@@ -70,7 +69,7 @@ root [0] .L macros/extractEventsWtGeCoincidence.cpp
 root [1] extractEventsWtGeCoincidence("/home/data/another_simulation_dir/", "simulation_file")
 ```
 
-##### Filter Customization
+#### Filter Customization
 The selection can be customized with the following parameters:
 |        Parameter           | Description |
 | -------------------------- | ----------- |
