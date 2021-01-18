@@ -7,8 +7,10 @@ It is composed by the following tools:
 - **Macros**: these are various root macros used for analysis or processing simulation files.
 
 ## Detection Slicer
+TODO: Write short documentation
 
 ## Snapshot Creator
+TODO: Write short documentation
 
 ## Extraction Muon events in coincidence with Germanium
 One of the analysis performed consists of considering the performance of the trained model considering the coincidence with Germanium.
