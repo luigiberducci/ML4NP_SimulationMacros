@@ -309,7 +309,7 @@ void loadOpticalMap(const char * mapDir="OpticalMaps",
     cout << "[Info] Loaded Optical Map " << mapFilePath << endl;
 }
 
-void loadSpatialMaps(const char * mapDir="OpticalMaps",
+void loadSpatialMaps(const char * mapDir="maps",
                     const char * mapFileName = "ToySpatialMap_711R_100AngleSlices_10000ops_AttLen500.000000_NewSampling_Last",
                     const char * PrInnerDetObjectName = "PrInnerDet",
                     const char * InnermapObjectName = "InnerMap",
